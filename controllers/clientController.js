@@ -18,9 +18,9 @@ const getClientById = (req, res) => {
 };
 // POST /api/client - Crear un nuevo cliente
 const createClient = (req, res) => {
-  const { name, lastname, email } = req.body;
-  if (!name || !lastname || email == null) {
-    return res.status(400).json({ message: "Nombre y precio son requeridos" });
+  const { name, lastname, email, phone } = req.body;
+  if (!name || !lastname || !phone || email == null) {
+    return res.status(400).json({ message: "Todos los datos son requeridos" });
   }
   if (!validate(email)) {
     return res.status(400).json({ message: "El email no es valido" });
@@ -30,6 +30,7 @@ const createClient = (req, res) => {
     name,
     lastname,
     email,
+    phone
   };
 
   clients.push(newClient);
@@ -38,15 +39,19 @@ const createClient = (req, res) => {
 // PUT /api/client/:id - Actualizar un Cliente existente
 const updateClient = (req, res) => {
   const id = parseInt(req.params.id, 10);
-  const { name, lastname, email } = req.body;
+  const { name, lastname, email, phone } = req.body;
   const client = clients.find((p) => p.id === id);
   if (!client) {
     return res.status(404).json({ message: "cliento no encontrado" });
+  }
+  if (!validate(email)) {
+    return res.status(400).json({ message: "El email no es valido" });
   }
   // Actualizar propiedades solo si se envían en el body
   if (name !== undefined) client.name = name;
   if (lastname !== undefined) client.lastname = lastname;
   if (email !== undefined) client.email = email;
+  if (phone !== undefined) client.phone = phone;
   res.json(client);
 };
 // DELETE /api/client/:id - Eliminar un Cliente
