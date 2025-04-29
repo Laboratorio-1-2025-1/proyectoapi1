@@ -9,14 +9,6 @@ const Order = sequelize.define('Order', {
     primaryKey: true,
     autoIncrement: true
   },
-  clientId: {
-    type: DataTypes.INTEGER,
-    allowNull: false,
-    references: {
-      model: Client,
-      key: 'id'
-    }
-  },
   total: {
     type: DataTypes.DECIMAL(10, 2),
     allowNull: false
@@ -41,8 +33,8 @@ const OrderProduct = sequelize.define('OrderProduct', {
 });
 
 // Definir las relaciones
-Order.belongsTo(Client);
-Client.hasMany(Order);
+Order.belongsTo(Client, { foreignKey: 'clientId' });
+Client.hasMany(Order, { foreignKey: 'clientId' });
 
 Order.belongsToMany(Product, { through: OrderProduct });
 Product.belongsToMany(Order, { through: OrderProduct });
