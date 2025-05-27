@@ -120,6 +120,19 @@ const options = {
             total: { type: 'number', format: 'float', description: 'Total de la factura' }
           }
         },
+        EmailLog: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer', description: 'ID del log' },
+            to: { type: 'string', description: 'Correo destinatario' },
+            subject: { type: 'string', description: 'Asunto del correo' },
+            status: { type: 'string', description: 'Estado del envío (success/error)' },
+            error: { type: 'string', description: 'Mensaje de error si lo hubo' },
+            attempts: { type: 'integer', description: 'Cantidad de intentos de envío' },
+            createdAt: { type: 'string', format: 'date-time', description: 'Fecha de creación del log' },
+            updatedAt: { type: 'string', format: 'date-time', description: 'Fecha de actualización del log' }
+          }
+        },
       },
     },
   },
