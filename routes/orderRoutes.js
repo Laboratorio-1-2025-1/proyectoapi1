@@ -104,7 +104,7 @@ router.post('/', authenticateToken, authorizeRoles('admin', 'empleado'), createO
  * @swagger
  * /api/orders/{id}:
  *   put:
- *     summary: Actualizar una orden
+ *     summary: Actualizar el estado, productos y cantidades de una orden
  *     tags: [Órdenes]
  *     parameters:
  *       - in: path
@@ -118,7 +118,27 @@ router.post('/', authenticateToken, authorizeRoles('admin', 'empleado'), createO
  *       content:
  *         application/json:
  *           schema:
- *             $ref: '#/components/schemas/Order'
+ *             type: object
+ *             properties:
+ *               status:
+ *                 type: string
+ *                 enum: [pending, completed, cancelled]
+ *                 description: Nuevo estado de la orden
+ *               products:
+ *                 type: array
+ *                 description: Lista de productos y cantidades a actualizar
+ *                 items:
+ *                   type: object
+ *                   required:
+ *                     - productId
+ *                     - quantity
+ *                   properties:
+ *                     productId:
+ *                       type: integer
+ *                       description: ID del producto
+ *                     quantity:
+ *                       type: integer
+ *                       description: Nueva cantidad del producto
  *     responses:
  *       200:
  *         description: Orden actualizada exitosamente
@@ -127,7 +147,7 @@ router.post('/', authenticateToken, authorizeRoles('admin', 'empleado'), createO
  *             schema:
  *               $ref: '#/components/schemas/Order'
  *       404:
- *         description: Orden no encontrada
+ *         description: Orden o producto no encontrado
  */
 router.put('/:id', authenticateToken, authorizeRoles('admin', 'empleado'), updateOrder);
 

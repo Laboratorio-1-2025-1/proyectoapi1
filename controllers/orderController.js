@@ -104,14 +104,36 @@ const createOrder = async (req, res) => {
 // PUT /api/order/:id - Actualizar una orden existente
 const updateOrder = async (req, res) => {
   try {
-    const { status } = req.body;
+    const { status, products } = req.body;
     const order = await Order.findByPk(req.params.id);
 
     if (!order) {
       return res.status(404).json({ message: "Orden no encontrada" });
     }
 
-    // Solo permitimos actualizar el estado
+    // Actualizar productos y cantidades si se envía el array products
+    if (products && Array.isArray(products) && products.length > 0) {
+      // Eliminar productos actuales
+      await OrderProduct.destroy({ where: { OrderId: order.id } });
+      let total = 0;
+      for (const item of products) {
+        const product = await Product.findByPk(item.productId);
+        if (!product) {
+          return res.status(404).json({ message: `Producto con ID ${item.productId} no encontrado` });
+        }
+        await OrderProduct.create({
+          OrderId: order.id,
+          ProductId: item.productId,
+          quantity: item.quantity,
+          price: product.price
+        });
+        total += parseFloat(product.price) * item.quantity;
+      }
+      // Actualizar el total de la orden
+      await order.update({ total });
+    }
+
+    // Actualizar el estado si se envía
     if (status) {
       await order.update({ status });
     }
