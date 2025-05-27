@@ -4,6 +4,7 @@ import {
   getAllInvoices,
   getInvoiceById
 } from '../controllers/invoiceController.js';
+import { authenticateToken, authorizeRoles } from '../services/authMiddleware.js';
 
 const router = express.Router();
 
@@ -23,7 +24,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Invoice'
  */
-router.get('/', getAllInvoices);
+router.get('/', authenticateToken, authorizeRoles('admin', 'empleado'), getAllInvoices);
 
 /**
  * @swagger
@@ -48,7 +49,7 @@ router.get('/', getAllInvoices);
  *       404:
  *         description: Factura no encontrada
  */
-router.get('/:id', getInvoiceById);
+router.get('/:id', authenticateToken, authorizeRoles('admin', 'empleado'), getInvoiceById);
 
 /**
  * @swagger
@@ -78,6 +79,6 @@ router.get('/:id', getInvoiceById);
  *       404:
  *         description: Orden no encontrada
  */
-router.post('/generate', generateInvoiceManual);
+router.post('/generate', authenticateToken, authorizeRoles('admin', 'empleado'), generateInvoiceManual);
 
 export default router;

@@ -1,5 +1,6 @@
 import express from "express";
 import { createClient, deleteClient, getAllClients, getClientById, updateClient } from "../controllers/clientController.js";
+import { authenticateToken, authorizeRoles } from '../services/authMiddleware.js';
 const router = express.Router();
 
 /**
@@ -18,7 +19,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Client'
  */
-router.get('/', getAllClients);
+router.get('/', authenticateToken, authorizeRoles('admin', 'empleado'), getAllClients);
 
 /**
  * @swagger
@@ -43,7 +44,7 @@ router.get('/', getAllClients);
  *       404:
  *         description: Cliente no encontrado
  */
-router.get('/:id', getClientById );
+router.get('/:id', authenticateToken, authorizeRoles('admin', 'empleado'), getClientById );
 
 /**
  * @swagger
@@ -67,7 +68,7 @@ router.get('/:id', getClientById );
  *       400:
  *         description: Datos inválidos
  */
-router.post('/', createClient );
+router.post('/', authenticateToken, authorizeRoles('admin'), createClient );
 
 /**
  * @swagger
@@ -98,7 +99,7 @@ router.post('/', createClient );
  *       404:
  *         description: Cliente no encontrado
  */
-router.put('/:id', updateClient );
+router.put('/:id', authenticateToken, authorizeRoles('admin'), updateClient );
 
 /**
  * @swagger
@@ -119,6 +120,6 @@ router.put('/:id', updateClient );
  *       404:
  *         description: Cliente no encontrado
  */
-router.delete('/:id', deleteClient );
+router.delete('/:id', authenticateToken, authorizeRoles('admin'), deleteClient );
 
-export default router;  
+export default router;

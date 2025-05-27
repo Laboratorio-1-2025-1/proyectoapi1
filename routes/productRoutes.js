@@ -1,5 +1,6 @@
 import express from "express";
 import { createProduct, deleteProduct, getAllProducts, getProductById, updateProduct } from "../controllers/productController.js";
+import { authenticateToken, authorizeRoles } from '../services/authMiddleware.js';
 const router = express.Router();
 
 /**
@@ -18,7 +19,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Product'
  */
-router.get('/', getAllProducts);
+router.get('/', authenticateToken, authorizeRoles('admin', 'empleado'), getAllProducts);
 
 /**
  * @swagger
@@ -43,7 +44,7 @@ router.get('/', getAllProducts);
  *       404:
  *         description: Producto no encontrado
  */
-router.get('/:id', getProductById );
+router.get('/:id', authenticateToken, authorizeRoles('admin', 'empleado'), getProductById );
 
 /**
  * @swagger
@@ -67,7 +68,7 @@ router.get('/:id', getProductById );
  *       400:
  *         description: Datos inválidos
  */
-router.post('/', createProduct );
+router.post('/', authenticateToken, authorizeRoles('admin'), createProduct );
 
 /**
  * @swagger
@@ -98,7 +99,7 @@ router.post('/', createProduct );
  *       404:
  *         description: Producto no encontrado
  */
-router.put('/:id', updateProduct );
+router.put('/:id', authenticateToken, authorizeRoles('admin'), updateProduct );
 
 /**
  * @swagger
@@ -119,6 +120,6 @@ router.put('/:id', updateProduct );
  *       404:
  *         description: Producto no encontrado
  */
-router.delete('/:id', deleteProduct );
+router.delete('/:id', authenticateToken, authorizeRoles('admin'), deleteProduct );
 
-export default router;  
+export default router;

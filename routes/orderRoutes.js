@@ -6,6 +6,7 @@ import {
   updateOrder,
   deleteOrder
 } from '../controllers/orderController.js';
+import { authenticateToken, authorizeRoles } from '../services/authMiddleware.js';
 
 const router = express.Router();
 
@@ -25,7 +26,7 @@ const router = express.Router();
  *               items:
  *                 $ref: '#/components/schemas/Order'
  */
-router.get('/', getAllOrders);
+router.get('/', authenticateToken, authorizeRoles('admin', 'empleado'), getAllOrders);
 
 /**
  * @swagger
@@ -50,7 +51,7 @@ router.get('/', getAllOrders);
  *       404:
  *         description: Orden no encontrada
  */
-router.get('/:id', getOrderById);
+router.get('/:id', authenticateToken, authorizeRoles('admin', 'empleado'), getOrderById);
 
 /**
  * @swagger
@@ -97,7 +98,7 @@ router.get('/:id', getOrderById);
  *       404:
  *         description: Cliente o producto no encontrado
  */
-router.post('/', createOrder);
+router.post('/', authenticateToken, authorizeRoles('admin', 'empleado'), createOrder);
 
 /**
  * @swagger
@@ -128,7 +129,7 @@ router.post('/', createOrder);
  *       404:
  *         description: Orden no encontrada
  */
-router.put('/:id', updateOrder);
+router.put('/:id', authenticateToken, authorizeRoles('admin', 'empleado'), updateOrder);
 
 /**
  * @swagger
@@ -149,6 +150,6 @@ router.put('/:id', updateOrder);
  *       404:
  *         description: Orden no encontrada
  */
-router.delete('/:id', deleteOrder);
+router.delete('/:id', authenticateToken, authorizeRoles('admin'), deleteOrder);
 
 export default router;
