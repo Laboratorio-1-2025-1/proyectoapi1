@@ -40,10 +40,9 @@ const getOrderById = async (req, res) => {
 // POST /api/order - Crear una nueva orden
 const createOrder = async (req, res) => {
   try {
-    const { clientId, products, total } = req.body;
-    
+    const { clientId, products } = req.body;
     // Validación básica
-    if (!clientId || !products || !Array.isArray(products) || products.length === 0 || !total) {
+    if (!clientId || !products || !Array.isArray(products) || products.length === 0) {
       return res.status(400).json({ message: "Datos incompletos o inválidos" });
     }
 
@@ -51,6 +50,16 @@ const createOrder = async (req, res) => {
     const client = await Client.findByPk(clientId);
     if (!client) {
       return res.status(404).json({ message: "Cliente no encontrado" });
+    }
+
+    // Calcular el total sumando (precio * cantidad) de cada producto
+    let total = 0;
+    for (const item of products) {
+      const product = await Product.findByPk(item.productId);
+      if (!product) {
+        return res.status(404).json({ message: `Producto con ID ${item.productId} no encontrado` });
+      }
+      total += parseFloat(product.price) * item.quantity;
     }
 
     // Crear la orden
@@ -63,11 +72,6 @@ const createOrder = async (req, res) => {
     // Agregar productos a la orden
     for (const item of products) {
       const product = await Product.findByPk(item.productId);
-      if (!product) {
-        await order.destroy(); // Eliminar la orden si el producto no existe
-        return res.status(404).json({ message: `Producto con ID ${item.productId} no encontrado` });
-      }
-
       await OrderProduct.create({
         OrderId: order.id,
         ProductId: item.productId,
@@ -89,7 +93,6 @@ const createOrder = async (req, res) => {
       await sendInvoice(order.id);
     } catch (emailError) {
       console.error('Error al enviar la factura:', emailError);
-      // No fallamos la creación de la orden si falla el envío del email
     }
 
     res.status(201).json(completeOrder);
@@ -148,4 +151,4 @@ export {
   createOrder,
   updateOrder,
   deleteOrder
-}; 
+};

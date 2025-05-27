@@ -107,10 +107,23 @@ const options = {
             },
           },
         },
+        Invoice: {
+          type: 'object',
+          properties: {
+            id: { type: 'integer', description: 'ID de la factura' },
+            number: { type: 'string', description: 'Número de factura' },
+            date: { type: 'string', format: 'date-time', description: 'Fecha de emisión' },
+            clientId: { type: 'integer', description: 'ID del cliente' },
+            orderId: { type: 'integer', description: 'ID de la orden' },
+            subtotal: { type: 'number', format: 'float', description: 'Subtotal de la factura' },
+            tax: { type: 'number', format: 'float', description: 'Impuesto aplicado' },
+            total: { type: 'number', format: 'float', description: 'Total de la factura' }
+          }
+        },
       },
     },
   },
   apis: ['./routes/*.js'], // Rutas donde buscar la documentación
 };
 
-export const specs = swaggerJsdoc(options); 
+export const specs = swaggerJsdoc(options);

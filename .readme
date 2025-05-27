@@ -1,0 +1,60 @@
+# API de Gestión de Órdenes
+
+Este proyecto es una API RESTful construida con Node.js, Express y Sequelize para la gestión de clientes, productos y órdenes, incluyendo el envío de facturas por correo electrónico utilizando SendGrid.
+
+## Características
+
+- CRUD de clientes, productos y órdenes.
+- Relación entre órdenes, productos y clientes.
+- Envío automático de facturas por correo electrónico al crear una orden.
+- Documentación interactiva con Swagger (disponible en `/api-docs`).
+
+## Instalación
+
+1. Clona el repositorio y navega al directorio del proyecto.
+2. Instala las dependencias:
+
+   ```powershell
+   npm install
+   ```
+
+3. Copia el archivo `.env.example` a `.env` y configura tus credenciales de SendGrid:
+
+   ```
+   SENDGRID_API_KEY=tu_api_key
+   SENDGRID_FROM_EMAIL=tu_email_verificado@dominio.com
+   ```
+
+4. Inicia el servidor:
+
+   ```powershell
+   npm start
+   ```
+
+5. Accede a la documentación Swagger en: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+
+## Estructura del Proyecto
+
+- `controllers/` - Lógica de negocio para cada entidad.
+- `models/` - Definición de modelos Sequelize.
+- `routes/` - Definición de rutas de la API.
+- `services/` - Servicios auxiliares (ej: envío de facturas).
+- `config/` - Configuración de base de datos, SendGrid y Swagger.
+
+## Endpoints Principales
+
+- `/api/clients` - Gestión de clientes.
+- `/api/products` - Gestión de productos.
+- `/api/orders` - Gestión de órdenes.
+
+Consulta la documentación Swagger para detalles de cada endpoint.
+
+## Notas
+
+- La base de datos utiliza SQLite y se almacena en `database.sqlite`.
+- El envío de correos requiere una cuenta y API Key de SendGrid.
+- No olvides agregar tu archivo `.env` al `.gitignore` para proteger tus credenciales.
+
+---
+
+Desarrollado para fines académicos.

@@ -67,7 +67,6 @@ router.get('/:id', getOrderById);
  *             required:
  *               - clientId
  *               - products
- *               - total
  *             properties:
  *               clientId:
  *                 type: integer
@@ -86,10 +85,6 @@ router.get('/:id', getOrderById);
  *                     quantity:
  *                       type: integer
  *                       description: Cantidad del producto
- *               total:
- *                 type: number
- *                 format: float
- *                 description: Total de la orden
  *     responses:
  *       201:
  *         description: Orden creada exitosamente
@@ -156,4 +151,4 @@ router.put('/:id', updateOrder);
  */
 router.delete('/:id', deleteOrder);
 
-export default router; 
+export default router;

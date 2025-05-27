@@ -2,8 +2,16 @@ import { sendEmail } from '../config/sendgrid.js';
 import { Order, OrderProduct } from '../models/Order.js';
 import Client from '../models/Client.js';
 import Product from '../models/Product.js';
+import EmailLog from '../models/EmailLog.js';
 
-const generateInvoiceHTML = (order, client, products) => {
+// Plantilla configurable (puedes cambiar el HTML aquí o cargarlo de un archivo)
+let emailTemplate = null;
+
+export function setInvoiceEmailTemplate(templateFn) {
+  emailTemplate = templateFn;
+}
+
+const defaultInvoiceTemplate = (order, client, products) => {
   return `
     <!DOCTYPE html>
     <html>
@@ -131,16 +139,22 @@ const generateInvoiceHTML = (order, client, products) => {
   `;
 };
 
+const generateInvoiceHTML = (order, client, products) => {
+  if (emailTemplate) return emailTemplate(order, client, products);
+  return defaultInvoiceTemplate(order, client, products);
+};
+
 export const sendInvoice = async (orderId) => {
+  let attempts = 0;
+  let status = 'success';
+  let errorMsg = null;
+  let logData = { to: '', subject: '', status: '', error: '', attempts: 0 };
   try {
     // Obtener la orden con sus relaciones
     const order = await Order.findByPk(orderId, {
       include: [
         { model: Client },
-        { 
-          model: Product,
-          through: { attributes: ['quantity', 'price'] }
-        }
+        { model: Product, through: { attributes: ['quantity', 'price'] } }
       ]
     });
 
@@ -151,16 +165,29 @@ export const sendInvoice = async (orderId) => {
     // Generar el HTML de la factura
     const invoiceHTML = generateInvoiceHTML(order, order.Client, order.Products);
 
+    attempts = 1;
+    logData.to = order.Client.email;
+    logData.subject = `Factura #${order.id} - Tu Compra`;
     // Enviar el email
     await sendEmail(
       order.Client.email,
-      `Factura #${order.id} - Tu Compra`,
+      logData.subject,
       invoiceHTML
     );
-
-    return true;
+    logData.status = 'success';
+    logData.error = null;
+    logData.attempts = attempts;
   } catch (error) {
-    console.error('Error al enviar la factura:', error);
-    throw error;
+    status = 'error';
+    errorMsg = error.message;
+    attempts = 1;
+    logData.status = 'error';
+    logData.error = errorMsg;
+    logData.attempts = attempts;
+  } finally {
+    // Registrar log de envío
+    await EmailLog.create(logData);
   }
-}; 
+  if (status === 'error') throw new Error(errorMsg);
+  return true;
+};

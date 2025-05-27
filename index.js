@@ -3,10 +3,8 @@ import express from "express";
 import clientRoutes from "./routes/clientRoutes.js";
 import productRoutes from "./routes/productRoutes.js";
 import orderRoutes from "./routes/orderRoutes.js";
+import invoiceRoutes from "./routes/invoiceRoutes.js";
 import sequelize from "./config/database.js";
-import Client from "./models/Client.js";
-import Product from "./models/Product.js";
-import { Order, OrderProduct } from "./models/Order.js";
 import swaggerUi from 'swagger-ui-express';
 import { specs } from './config/swagger.js';
 
@@ -23,6 +21,7 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 app.use('/api/products', productRoutes);
 app.use('/api/clients', clientRoutes);
 app.use('/api/orders', orderRoutes);
+app.use('/api/invoices', invoiceRoutes);
 
 // Inicializar la base de datos
 const initDatabase = async () => {
