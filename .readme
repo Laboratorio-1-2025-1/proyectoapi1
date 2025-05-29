@@ -1,12 +1,15 @@
 # API de Gestión de Órdenes
 
-Este proyecto es una API RESTful construida con Node.js, Express y Sequelize para la gestión de clientes, productos y órdenes, incluyendo el envío de facturas por correo electrónico utilizando SendGrid.
+Este proyecto es una API RESTful construida con Node.js, Express y Sequelize para la gestión de clientes, productos y órdenes, incluyendo la **generación y almacenamiento automático de facturas** y el envío de facturas por correo electrónico utilizando SendGrid.
 
 ## Características
 
 - CRUD de clientes, productos y órdenes.
 - Relación entre órdenes, productos y clientes.
-- Envío automático de facturas por correo electrónico al crear una orden.
+- **Facturación automática:** al crear una orden, se genera y almacena una factura en la base de datos (con numeración, subtotal, impuestos y total).
+- **Envío automático de facturas por correo electrónico** al cliente tras crear la orden.
+- Registro de logs de envío de correo (EmailLog).
+- **Autenticación JWT con roles (admin, empleado).**
 - Documentación interactiva con Swagger (disponible en `/api-docs`).
 
 ## Instalación
@@ -43,16 +46,21 @@ Este proyecto es una API RESTful construida con Node.js, Express y Sequelize par
 
 ## Endpoints Principales
 
+- `/api/auth/register` - Registro de usuario (admin o empleado).
+- `/api/auth/login` - Login de usuario (obtención de token JWT).
 - `/api/clients` - Gestión de clientes.
 - `/api/products` - Gestión de productos.
-- `/api/orders` - Gestión de órdenes.
+- `/api/orders` - Gestión de órdenes (al crear una orden, se genera y envía la factura automáticamente).
+- `/api/invoices` - Consulta de facturas generadas.
+- `/api/email-logs` - Consulta de logs de envío de correos.
 
-Consulta la documentación Swagger para detalles de cada endpoint.
+Consulta la documentación Swagger para detalles de cada endpoint, ejemplos de request/response y uso de autenticación.
 
 ## Notas
 
 - La base de datos utiliza SQLite y se almacena en `database.sqlite`.
 - El envío de correos requiere una cuenta y API Key de SendGrid.
+- Para acceder a los endpoints protegidos, primero realiza login y usa el token JWT en el header `Authorization: Bearer <token>`.
 - No olvides agregar tu archivo `.env` al `.gitignore` para proteger tus credenciales.
 
 ---
