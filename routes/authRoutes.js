@@ -5,6 +5,49 @@ import express from 'express';
 
 const router = express.Router();
 
+/**
+ * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Registro de usuario
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: Nombre de usuario único
+ *               password:
+ *                 type: string
+ *                 description: Contraseña del usuario
+ *               role:
+ *                 type: string
+ *                 enum: [admin, empleado]
+ *                 description: Rol del usuario (opcional, por defecto empleado)
+ *     responses:
+ *       201:
+ *         description: Usuario registrado exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 username:
+ *                   type: string
+ *                 role:
+ *                   type: string
+ *       400:
+ *         description: Datos inválidos
+ */
 // Registro de usuario
 router.post('/register', async (req, res) => {
   try {
@@ -18,6 +61,50 @@ router.post('/register', async (req, res) => {
   }
 });
 
+/**
+ * @swagger
+ * /api/auth/login:
+ *   post:
+ *     summary: Login de usuario (obtención de JWT)
+ *     tags: [Auth]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 description: Nombre de usuario
+ *               password:
+ *                 type: string
+ *                 description: Contraseña
+ *     responses:
+ *       200:
+ *         description: Login exitoso, retorna el token JWT y datos del usuario
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 token:
+ *                   type: string
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                     username:
+ *                       type: string
+ *                     role:
+ *                       type: string
+ *       401:
+ *         description: Credenciales inválidas
+ */
 // Login de usuario
 router.post('/login', async (req, res) => {
   try {
