@@ -1,7 +1,9 @@
 import { Order, OrderProduct } from '../models/Order.js';
 import Product from '../models/Product.js';
 import Client from '../models/Client.js';
+import Invoice from '../models/Invoice.js';
 import { sendInvoice } from '../services/invoiceService.js';
+import { Op } from 'sequelize';
 
 // GET /api/order - Obtener todas las órdenes
 const getAllOrders = async (req, res) => {
@@ -88,14 +90,49 @@ const createOrder = async (req, res) => {
       ]
     });
 
-    // Enviar la factura por email
+    // --- FACTURACIÓN AUTOMÁTICA ---
+    // Lógica de numeración y cálculo de impuestos (copiada de invoiceController.js)
+    async function generateInvoiceNumber() {
+      const now = new Date();
+      const yearMonth = `${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}`;
+      const lastInvoice = await Invoice.findOne({
+        where: { number: { [Op.like]: `FACT-${yearMonth}-%` } },
+        order: [['createdAt', 'DESC']]
+      });
+      let next = 1;
+      if (lastInvoice) {
+        const lastNumber = parseInt(lastInvoice.number.split('-')[2], 10);
+        next = lastNumber + 1;
+      }
+      return `FACT-${yearMonth}-${String(next).padStart(4, '0')}`;
+    }
+    function calculateTax(subtotal) {
+      const taxRate = 0.19;
+      return subtotal * taxRate;
+    }
+    // Crear la factura asociada a la orden
+    const subtotal = parseFloat(order.total);
+    const tax = calculateTax(subtotal);
+    const totalFactura = subtotal + tax;
+    const number = await generateInvoiceNumber();
+    const invoice = await Invoice.create({
+      number,
+      date: new Date(),
+      clientId: order.clientId,
+      orderId: order.id,
+      subtotal,
+      tax,
+      total: totalFactura
+    });
+
+    // Enviar la factura por email (puedes adaptar sendInvoice para recibir la factura si lo deseas)
     try {
-      await sendInvoice(order.id);
+      await sendInvoice(order.id); // El template puede mostrar el total de la factura (con impuestos)
     } catch (emailError) {
       console.error('Error al enviar la factura:', emailError);
     }
 
-    res.status(201).json(completeOrder);
+    res.status(201).json({ order: completeOrder, invoice });
   } catch (error) {
     res.status(500).json({ message: 'Error al crear la orden', error: error.message });
   }
