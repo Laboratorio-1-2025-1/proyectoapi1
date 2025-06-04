@@ -32,6 +32,11 @@ const createClient = async (req, res) => {
       return res.status(400).json({ message: "Todos los datos son requeridos" });
     }
 
+    // Validar formato de email
+    if (!validate(email)) {
+      return res.status(400).json({ message: "El email no es válido" });
+    }
+
     const client = await Client.create({
       name,
       lastname,
@@ -56,6 +61,11 @@ const updateClient = async (req, res) => {
 
     if (!client) {
       return res.status(404).json({ message: "Cliente no encontrado" });
+    }
+
+    // Validar formato de email si se envía uno nuevo
+    if (email && !validate(email)) {
+      return res.status(400).json({ message: "El email no es válido" });
     }
 
     await client.update({
